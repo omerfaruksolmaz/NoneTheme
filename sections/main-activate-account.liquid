@@ -1,0 +1,199 @@
+{%- liquid
+  assign has_social_links = false
+  if settings.social_instagram_link != blank
+    assign has_social_links = true
+  elsif settings.social_facebook_link != blank
+    assign has_social_links = true
+  elsif settings.social_tiktok_link != blank
+    assign has_social_links = true
+  elsif settings.social_youtube_link != blank
+    assign has_social_links = true
+  elsif section.settings.social_x_link != blank
+    assign has_social_links = true
+  elsif section.settings.social_trendyol_link != blank
+    assign has_social_links = true
+  endif
+-%}
+
+{%- style -%}
+  .footer {
+    margin-top: {{ section.settings.margin_top | times: 0.75 | round: 0 }}px;
+    border-top: none !important;
+  }
+
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  /* --- Çizgileri Kökten Kaldıran Minimalist CSS --- */
+  .editorial-footer, 
+  .editorial-footer__grid, 
+  .editorial-footer__column {
+    border: none !important;
+    border-right: none !important;
+    border-left: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Bazı temalar çizgiyi 'after' veya 'before' ile ekler, onları da siliyoruz */
+  .editorial-footer__column::after, 
+  .editorial-footer__column::before,
+  .editorial-footer__grid::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  /* Yazıların birbirine çok yapışmaması için hafif bir boşluk bırakalım */
+  .editorial-footer__grid {
+    display: grid;
+    gap: 2rem;
+  }
+
+  @media screen and (min-width: 750px) {
+    .footer {
+      margin-top: {{ section.settings.margin_top }}px;
+    }
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<footer class="footer editorial-footer section-{{ section.id }}-padding">
+  <div class="page-width">
+    <div class="editorial-footer__grid">
+      
+      <div class="editorial-footer__column editorial-footer__brand-column">
+        <a class="editorial-footer__brand editorial-footer__brand-text" href="{{ routes.root_url }}" style="letter-spacing: -0.02em;">
+          None Wear
+        </a>
+        <p class="editorial-footer__contact">
+          <a href="mailto:info@nonewear.com.tr">info@nonewear.com.tr</a><br>
+          <a href="mailto:destek@nonewear.com.tr">destek@nonewear.com.tr</a>
+        </p>
+      </div>
+
+      <div class="editorial-footer__column">
+        <h2 class="editorial-footer__heading">SHOP</h2>
+        <ul class="editorial-footer__menu">
+          <li><a href="{{ routes.collections_url }}">TÜM ÜRÜNLER</a></li>
+          <li><a href="{{ routes.root_url }}#drop">DROP</a></li>
+          <li><a href="{{ routes.search_url }}">ARAMA</a></li>
+          <li><a href="{{ routes.cart_url }}">SEPET</a></li>
+        </ul>
+      </div>
+
+      <div class="editorial-footer__column">
+        <h2 class="editorial-footer__heading">DESTEK</h2>
+        <ul class="editorial-footer__menu">
+          <li><a href="mailto:destek@nonewear.com.tr">MÜŞTERİ DESTEĞİ</a></li>
+          <li><a href="/pages/teslimat-iade">İADE / DEĞİŞİM</a></li>
+          <li><a href="/pages/distance-sales">SATIŞ KOŞULLARI</a></li>
+          <li><a href="/pages/privacy">KVKK / GİZLİLİK</a></li>
+        </ul>
+      </div>
+
+      <div class="editorial-footer__column">
+        {%- if section.settings.newsletter_enable -%}
+          <h2 class="editorial-footer__heading">{{ section.settings.newsletter_heading | default: 'DROP LİST' }}</h2>
+          <p class="editorial-footer__statement">{{ section.settings.newsletter_text }}</p>
+          {%- form 'customer', id: 'ContactFooter', class: 'footer__newsletter newsletter-form' -%}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <div class="editorial-footer__newsletter-form">
+              <input id="NewsletterForm--{{ section.id }}" class="field__input" type="email" name="contact[email]" value="{{ form.email }}" placeholder="Mail adresi" required>
+              <button class="button" type="submit">KATIL</button>
+            </div>
+          {%- endform -%}
+        {%- endif -%}
+
+        <div class="editorial-footer__payments" style="margin-top: 2rem;">
+          <h2 class="editorial-footer__heading">GÜVENLİ ÖDEME</h2>
+          {% render 'nonewear-payment-logos' %}
+        </div>
+
+        <div class="editorial-footer__theme" style="margin-top: 2rem;">
+          <h2 class="editorial-footer__heading">TEMA</h2>
+          <div class="nonewear-theme-toggle" data-nonewear-theme-toggle>
+            <button type="button" data-nonewear-theme-choice="light">AYDINLIK</button>
+            <button type="button" data-nonewear-theme-choice="dark">KARANLIK</button>
+          </div>
+        </div>
+
+        {%- if section.settings.show_social and has_social_links -%}
+          <div class="editorial-footer__social-wrap" style="margin-top: 2rem;">
+            <h2 class="editorial-footer__heading">SOSYAL</h2>
+            <ul class="editorial-footer__social" style="list-style: none; padding: 0; display: flex; gap: 15px;">
+              {%- if settings.social_instagram_link != blank -%}<li><a href="{{ settings.social_instagram_link }}">Instagram</a></li>{%- endif -%}
+              {%- if section.settings.social_trendyol_link != blank -%}<li><a href="{{ section.settings.social_trendyol_link }}">Trendyol</a></li>{%- endif -%}
+              {%- if section.settings.social_x_link != blank -%}<li><a href="{{ section.settings.social_x_link }}">X</a></li>{%- endif -%}
+              {%- if settings.social_tiktok_link != blank -%}<li><a href="{{ settings.social_tiktok_link }}">TikTok</a></li>{%- endif -%}
+            </ul>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <div class="editorial-footer__bottom" style="margin-top: 3rem; opacity: 0.7;">
+      <span>© {{ 'now' | date: '%Y' }} none wear | Created by ©walhalla</span>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "newsletter_enable",
+      "label": "Bülten Aktif mi?",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "newsletter_heading",
+      "label": "Bülten Başlığı",
+      "default": "DROP LİST"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_text",
+      "label": "Bülten Metni",
+      "default": "YENİ DROP VE SINIRLI STOK BİLGİSİNİ İLK ALANLARDAN OL."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social",
+      "label": "Sosyal Medya Göster",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "social_x_link",
+      "label": "X (Twitter) Linki"
+    },
+    {
+      "type": "url",
+      "id": "social_trendyol_link",
+      "label": "Trendyol Mağaza Linki"
+    },
+    {
+      "type": "range",
+      "id": "margin_top",
+      "min": 0, "max": 80, "step": 4, "unit": "px", "label": "Üst Boşluk", "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0, "max": 80, "step": 4, "unit": "px", "label": "İç Üst Boşluk", "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0, "max": 80, "step": 4, "unit": "px", "label": "İç Alt Boşluk", "default": 40
+    }
+  ]
+}
+{% endschema %}

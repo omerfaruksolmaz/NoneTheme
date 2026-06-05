@@ -1,0 +1,273 @@
+{% comment %}
+  Editorial homepage hero with image-first layout and note blocks.
+{% endcomment %}
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  .section-{{ section.id }}-hero-height {
+    min-height: {{ section.settings.hero_height | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+
+    .section-{{ section.id }}-hero-height {
+      min-height: {{ section.settings.hero_height }}px;
+    }
+  }
+{%- endstyle -%}
+
+<section class="editorial-hero section-{{ section.id }}-padding">
+  <div class="page-width">
+    <div class="editorial-hero__layout">
+      <div class="editorial-hero__media section-{{ section.id }}-hero-height">
+        {%- if section.settings.image != blank -%}
+          {%- if section.settings.image_link != blank -%}
+            <a class="editorial-hero__media-link" href="{{ section.settings.image_link }}">
+          {%- endif -%}
+          <div class="editorial-hero__image-wrap">
+            {{
+              section.settings.image
+              | image_url: width: 2400
+              | image_tag:
+                class: 'editorial-hero__image',
+                loading: 'eager',
+                fetchpriority: 'high',
+                widths: '600, 900, 1200, 1500, 1800, 2200, 2400',
+                sizes: '(min-width: 990px) 65vw, 100vw',
+                alt: section.settings.image.alt | default: shop.name | escape
+            }}
+          </div>
+          {%- if section.settings.image_link != blank -%}
+            </a>
+          {%- endif -%}
+        {%- else -%}
+          <div class="editorial-hero__image-wrap editorial-hero__image-wrap--fallback">
+            <div class="editorial-hero__fallback">
+              <img
+                class="editorial-hero__fallback-symbol"
+                src="{{ 'nonewear-e-logo.png' | asset_url }}"
+                alt=""
+                width="120"
+                height="120"
+                loading="eager"
+              >
+              <img
+                class="editorial-hero__fallback-wordmark editorial-hero__fallback-wordmark--light"
+                src="{{ 'nonewear-wordmark-black.png' | asset_url }}"
+                alt="None Wear"
+                width="360"
+                height="50"
+                loading="eager"
+              >
+              <img
+                class="editorial-hero__fallback-wordmark editorial-hero__fallback-wordmark--dark"
+                src="{{ 'nonewear-wordmark-white.png' | asset_url }}"
+                alt="None Wear"
+                width="360"
+                height="50"
+                loading="eager"
+              >
+              <p>{{ section.settings.brand_statement | escape }}</p>
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.vertical_label != blank -%}
+          <div class="editorial-hero__vertical-label">{{ section.settings.vertical_label | escape }}</div>
+        {%- endif -%}
+        {%- if section.settings.season_label != blank -%}
+          <div class="editorial-hero__season editorial-meta">{{ section.settings.season_label | escape }}</div>
+        {%- endif -%}
+        {%- if section.settings.view_link_label != blank and section.settings.view_link != blank -%}
+          <div class="editorial-hero__view">
+            <a class="editorial-link" href="{{ section.settings.view_link }}">{{ section.settings.view_link_label | escape }}</a>
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="editorial-hero__notes">
+        {%- for block in section.blocks -%}
+          <article class="editorial-hero__note" {{ block.shopify_attributes }}>
+            <div>
+              {%- if block.settings.label != blank -%}
+                <div class="editorial-meta">{{ block.settings.label | escape }}</div>
+              {%- endif -%}
+              {%- if block.settings.heading != blank -%}
+                <h2 class="editorial-hero__note-heading">{{ block.settings.heading | escape }}</h2>
+              {%- endif -%}
+            </div>
+            <div>
+              {%- if block.settings.body != blank -%}
+                <div class="editorial-hero__note-body rte">{{ block.settings.body }}</div>
+              {%- endif -%}
+              {%- if block.settings.link_label != blank and block.settings.link != blank -%}
+                <div class="editorial-hero__note-link">
+                  <a class="editorial-link" href="{{ block.settings.link }}">{{ block.settings.link_label | escape }}</a>
+                </div>
+              {%- endif -%}
+            </div>
+          </article>
+        {%- endfor -%}
+
+        {%- if section.blocks.size < 4 -%}
+          {%- for i in (section.blocks.size..3) -%}
+            <div class="editorial-hero__note--empty"></div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Editorial hero",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Hero image"
+    },
+    {
+      "type": "url",
+      "id": "image_link",
+      "label": "Hero image link"
+    },
+    {
+      "type": "text",
+      "id": "vertical_label",
+      "label": "Vertical label",
+      "default": "New arrivals"
+    },
+    {
+      "type": "text",
+      "id": "season_label",
+      "label": "Bottom-left label",
+      "default": "Spring Summer"
+    },
+    {
+      "type": "text",
+      "id": "view_link_label",
+      "label": "Bottom-right link label",
+      "default": "View more"
+    },
+    {
+      "type": "url",
+      "id": "view_link",
+      "label": "Bottom-right link"
+    },
+    {
+      "type": "text",
+      "id": "brand_statement",
+      "label": "Fallback brand statement",
+      "default": "Kural yok. Sistem dışı. Giy ve kaybol."
+    },
+    {
+      "type": "range",
+      "id": "hero_height",
+      "min": 480,
+      "max": 920,
+      "step": 20,
+      "unit": "px",
+      "label": "Hero height",
+      "default": 720
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "note",
+      "name": "Editorial note",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Neighborhood"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Quiet streetwear essentials"
+        },
+        {
+          "type": "richtext",
+          "id": "body",
+          "label": "Body",
+          "default": "<p>Use these note blocks to place restrained editorial copy, category labels, or collection notes.</p>"
+        },
+        {
+          "type": "text",
+          "id": "link_label",
+          "label": "Link label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 4,
+  "presets": [
+    {
+      "name": "Editorial hero",
+      "blocks": [
+        {
+          "type": "note"
+        },
+        {
+          "type": "note",
+          "settings": {
+            "label": "Catalogue",
+            "heading": "Strict, sparse, aligned",
+            "body": "<p>Large blank cells are intentional. Use them to keep the homepage calm and product-first.</p>"
+          }
+        },
+        {
+          "type": "note",
+          "settings": {
+            "label": "Featured",
+            "heading": "One third (kids)",
+            "body": "<p>Reserve one cell for an alternate label, editorial note, or quiet callout.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

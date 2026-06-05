@@ -1,0 +1,167 @@
+{% comment %}
+  Shared editorial product info markup.
+{% endcomment %}
+{%- liquid
+  assign product_form_id = 'product-form-' | append: section.id
+  assign material_metafield = product.metafields.custom.material
+  if material_metafield == blank
+    assign material_metafield = product.metafields.details.material
+  endif
+
+  assign material_value = blank
+  if material_metafield != blank
+    assign material_value = material_metafield.value | default: material_metafield
+  endif
+-%}
+
+<section
+  id="ProductInfo-{{ section.id }}"
+  class="editorial-product__info product__info-container{% if section.settings.enable_sticky_info %} product__column-sticky{% endif %}"
+>
+  {%- comment %} NEIGHBORHOOD.JP — vendor / marka etiketi + sold out {%- endcomment %}
+  <div class="editorial-product__brand-row">
+    {%- if product.vendor != blank -%}
+      <span class="editorial-product__vendor">{{ product.vendor | upcase | escape }}</span>
+    {%- endif -%}
+    {%- unless product.available -%}
+      <span class="editorial-product__sold-out-badge">SOLD OUT</span>
+    {%- endunless -%}
+    {%- if product.tags contains 'coming-soon' or product.tags contains 'coming soon' -%}
+      <span class="editorial-product__coming-soon-badge">COMING SOON</span>
+    {%- endif -%}
+  </div>
+
+  <div class="editorial-product__stack">
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        {%- when '@app' -%}
+          {% render block %}
+        {%- when 'text' -%}
+          {%- if block.settings.text != blank -%}
+            <p
+              class="{% if block.settings.text_style == 'subtitle' %}editorial-caption{% elsif block.settings.text_style == 'uppercase' %}editorial-meta{% else %}editorial-product__description{% endif %}"
+              {{ block.shopify_attributes }}
+            >
+              {{ block.settings.text }}
+            </p>
+          {%- endif -%}
+        {%- when 'title' -%}
+          <h1 class="editorial-product__title" {{ block.shopify_attributes }}>{{ product.title | escape }}</h1>
+        {%- when 'price' -%}
+          <div id="price-{{ section.id }}" class="editorial-product__price" role="status" {{ block.shopify_attributes }}>
+            {% render 'price', product: product, use_variant: true, show_badges: false %}
+          </div>
+        {%- when 'inventory' -%}
+          <p
+            id="Inventory-{{ section.id }}"
+            class="editorial-meta{% if product.selected_or_first_available_variant.inventory_management != 'shopify' %} hidden{% endif %}"
+            role="status"
+            {{ block.shopify_attributes }}
+          >
+            {%- if product.selected_or_first_available_variant.inventory_management == 'shopify' -%}
+              {%- if product.selected_or_first_available_variant.available -%}
+                {{ 'products.product.inventory_in_stock' | t }}
+              {%- else -%}
+                {{ 'products.product.sold_out' | t }}
+              {%- endif -%}
+            {%- endif -%}
+          </p>
+        {%- when 'variant_picker' -%}
+          {% render 'product-variant-picker', product: product, block: block, product_form_id: product_form_id %}
+          {%- if section.settings.size_guide_page != blank -%}
+            <a class="editorial-link editorial-product__size-guide" href="{{ section.settings.size_guide_page.url }}">
+              {{ section.settings.size_guide_label | escape }}
+            </a>
+          {%- endif -%}
+        {%- when 'buy_buttons' -%}
+          {%- render 'buy-buttons',
+            block: block,
+            product: product,
+            product_form_id: product_form_id,
+            section_id: section.id,
+            show_pickup_availability: false
+          -%}
+          <div class="editorial-product__trust">
+            {% render 'nonewear-payment-logos' %}
+            <p>SSL korumalı ödeme. Kredi kartı bilgileri None Wear tarafından saklanmaz.</p>
+          </div>
+        {%- when 'description' -%}
+          {%- if product.description != blank -%}
+            <div class="editorial-product__description rte" {{ block.shopify_attributes }}>
+              {{ product.description }}
+            </div>
+          {%- endif -%}
+        {%- when 'sku' -%}
+          <p
+            id="Sku-{{ section.id }}"
+            class="editorial-meta{% if product.selected_or_first_available_variant.sku == blank %} hidden{% endif %}"
+            role="status"
+            {{ block.shopify_attributes }}
+          >
+            {{ product.selected_or_first_available_variant.sku }}
+          </p>
+        {%- when 'custom_liquid' -%}
+          {{ block.settings.custom_liquid }}
+        {%- when 'collapsible_tab' -%}
+          <div class="editorial-product__accordion" {{ block.shopify_attributes }}>
+            <details>
+              <summary>
+                <span class="editorial-product__accordion-title">
+                  {{ block.settings.heading | default: block.settings.page.title | escape }}
+                </span>
+                <span class="editorial-meta">+</span>
+              </summary>
+              <div class="editorial-product__accordion-content rte">
+                {{ block.settings.content }}
+                {{ block.settings.page.content }}
+              </div>
+            </details>
+          </div>
+        {%- when 'share' -%}
+          <div class="editorial-product__share" {{ block.shopify_attributes }}>
+            <a class="editorial-link" href="{{ product.url }}">
+              {{ block.settings.share_label | default: 'Share' | escape }}
+            </a>
+          </div>
+      {%- endcase -%}
+    {%- endfor -%}
+
+    {%- if material_value != blank or product.selected_or_first_available_variant.sku != blank or product.type != blank -%}
+      <div class="editorial-product__technical">
+        {%- if product.selected_or_first_available_variant.sku != blank -%}
+          <div class="editorial-product__technical-line">
+            <span>Ürün kodu</span>
+            <span>{{ product.selected_or_first_available_variant.sku }}</span>
+          </div>
+        {%- endif -%}
+        {%- if material_value != blank -%}
+          <div class="editorial-product__technical-line">
+            <span>Materyal</span>
+            <span>{{ material_value }}</span>
+          </div>
+        {%- endif -%}
+        {%- if product.type != blank -%}
+          <div class="editorial-product__technical-line">
+            <span>Kategori</span>
+            <span>{{ product.type | escape }}</span>
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.support_link_label != blank or section.settings.delivery_link_label != blank -%}
+      <div class="editorial-product__support-links">
+        {%- if section.settings.support_link_label != blank and section.settings.support_link_url != blank -%}
+          <a class="editorial-link" href="{{ section.settings.support_link_url }}">
+            {{ section.settings.support_link_label | escape }}
+          </a>
+        {%- endif -%}
+        {%- if section.settings.delivery_link_label != blank and section.settings.delivery_link_url != blank -%}
+          <a class="editorial-link" href="{{ section.settings.delivery_link_url }}">
+            {{ section.settings.delivery_link_label | escape }}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>

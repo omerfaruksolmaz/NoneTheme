@@ -1,0 +1,181 @@
+{% comment %}
+  Homepage featured collection rendered with minimal editorial cards.
+{% endcomment %}
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<section id="drop" class="editorial-products section-{{ section.id }}-padding">
+  <div class="page-width">
+    {%- if section.settings.heading != blank or section.settings.note != blank -%}
+      <div class="editorial-products__intro">
+        {%- if section.settings.heading != blank -%}
+          <h2 class="editorial-products__heading">{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+        {%- if section.settings.note != blank -%}
+          <div class="editorial-meta">{{ section.settings.note | escape }}</div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.settings.collection != blank -%}
+      {%- assign featured_collection = section.settings.collection -%}
+      {%- paginate featured_collection.products by section.settings.products_to_show -%}
+        <div class="editorial-grid editorial-grid--products" style="--editorial-columns-desktop: {{ section.settings.columns_desktop }};">
+          {%- for product in featured_collection.products -%}
+            {% render 'product-card-minimal',
+              card_product: product,
+              show_vendor: section.settings.show_vendor,
+              show_product_type: section.settings.show_product_type,
+              show_secondary_image: section.settings.show_secondary_image,
+              lazy_load: forloop.index > 2,
+              media_ratio: '4 / 5'
+            %}
+          {%- endfor -%}
+        </div>
+
+        {%- if paginate.pages > 1 -%}
+          <nav class="editorial-pagination editorial-products__pagination" aria-label="Ürün sayfaları">
+            {%- if paginate.previous -%}
+              <a class="editorial-pagination__item" href="{{ paginate.previous.url }}">Önceki</a>
+            {%- else -%}
+              <span class="editorial-pagination__item is-disabled">Önceki</span>
+            {%- endif -%}
+
+            {%- for part in paginate.parts -%}
+              {%- if part.is_link -%}
+                <a class="editorial-pagination__item" href="{{ part.url }}">{{ part.title }}</a>
+              {%- elsif part.title == paginate.current_page -%}
+                <span class="editorial-pagination__item is-current">{{ part.title }}</span>
+              {%- else -%}
+                <span class="editorial-pagination__item">{{ part.title }}</span>
+              {%- endif -%}
+            {%- endfor -%}
+
+            {%- if paginate.next -%}
+              <a class="editorial-pagination__item" href="{{ paginate.next.url }}">Sonraki</a>
+            {%- else -%}
+              <span class="editorial-pagination__item is-disabled">Sonraki</span>
+            {%- endif -%}
+          </nav>
+        {%- endif -%}
+      {%- endpaginate -%}
+    {%- else -%}
+      <div class="editorial-grid editorial-grid--products" style="--editorial-columns-desktop: {{ section.settings.columns_desktop }};">
+        {%- for i in (1..section.settings.products_to_show) -%}
+          <div class="product-card-minimal">
+            <div class="product-card-minimal__media"></div>
+            <div class="product-card-minimal__body">
+              <div class="product-card-minimal__meta">none wear</div>
+              <div class="product-card-minimal__title">Sample product {{ i }}</div>
+              <div class="product-card-minimal__price-row">
+                <span>{{ 0 | money }}</span>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Minimal product grid",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Scroll"
+    },
+    {
+      "type": "text",
+      "id": "note",
+      "label": "Small note"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Featured collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 6,
+      "max": 60,
+      "step": 6,
+      "label": "Products per page",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 4,
+      "max": 6,
+      "step": 1,
+      "label": "Desktop columns",
+      "default": 6
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_type",
+      "label": "Show product type when vendor is hidden",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_secondary_image",
+      "label": "Show secondary image on hover",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Minimal product grid"
+    }
+  ]
+}
+{% endschema %}
