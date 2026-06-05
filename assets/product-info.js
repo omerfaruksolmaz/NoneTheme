@@ -187,6 +187,7 @@ if (!customElements.get('product-info')) {
           };
 
           updateSourceFromDestination('price');
+          this.updateStickyAddToCart(html);
           updateSourceFromDestination('Sku', ({ classList }) => classList.contains('hidden'));
           updateSourceFromDestination('Inventory', ({ innerText }) => innerText === '');
           updateSourceFromDestination('Volume');
@@ -237,6 +238,15 @@ if (!customElements.get('product-info')) {
           .map((id) => `#${id}-${this.dataset.section}`)
           .join(', ');
         document.querySelectorAll(selectors).forEach(({ classList }) => classList.add('hidden'));
+      }
+
+      updateStickyAddToCart(html) {
+        const sourcePrice = html.getElementById(`NwStickyPrice-${this.sectionId}`);
+        const destinationPrice = this.querySelector(`#NwStickyPrice-${this.dataset.section}`);
+
+        if (sourcePrice && destinationPrice) {
+          destinationPrice.innerHTML = sourcePrice.innerHTML;
+        }
       }
 
       updateMedia(html, variantFeaturedMediaId) {
