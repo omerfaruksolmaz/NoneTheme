@@ -15,6 +15,7 @@ if (!customElements.get('product-form')) {
         if (document.querySelector('cart-drawer')) this.submitButton.setAttribute('aria-haspopup', 'dialog');
 
         this.hideErrors = this.dataset.hideErrors === 'true';
+        this.syncSubmitButtons(this.submitButton.hasAttribute('disabled'), this.submitButtonText?.textContent);
       }
 
       onSubmitHandler(evt) {
@@ -25,6 +26,7 @@ if (!customElements.get('product-form')) {
 
         this.submitButton.setAttribute('aria-disabled', true);
         this.submitButton.classList.add('loading');
+        this.syncSubmitButtons(true);
         this.querySelector('.loading__spinner').classList.remove('hidden');
 
         const config = fetchConfig('javascript');
@@ -102,7 +104,10 @@ if (!customElements.get('product-form')) {
           .finally(() => {
             this.submitButton.classList.remove('loading');
             if (this.cart && this.cart.classList.contains('is-empty')) this.cart.classList.remove('is-empty');
-            if (!this.error) this.submitButton.removeAttribute('aria-disabled');
+            if (!this.error) {
+              this.submitButton.removeAttribute('aria-disabled');
+              this.syncSubmitButtons(false, window.variantStrings.addToCart);
+            }
             this.querySelector('.loading__spinner').classList.add('hidden');
 
             CartPerformance.measureFromEvent("add:user-action", evt);
@@ -124,13 +129,31 @@ if (!customElements.get('product-form')) {
         }
       }
 
+      syncSubmitButtons(disable = true, text) {
+        const productInfo = this.closest('product-info');
+        const buttons = productInfo
+          ? productInfo.querySelectorAll('[data-product-submit]')
+          : this.querySelectorAll('[data-product-submit]');
+
+        buttons.forEach((button) => {
+          if (disable) {
+            button.setAttribute('disabled', 'disabled');
+          } else {
+            button.removeAttribute('disabled');
+          }
+
+          if (text) {
+            const label = button.querySelector('span');
+            if (label) label.textContent = text;
+          }
+        });
+      }
+
       toggleSubmitButton(disable = true, text) {
         if (disable) {
-          this.submitButton.setAttribute('disabled', 'disabled');
-          if (text) this.submitButtonText.textContent = text;
+          this.syncSubmitButtons(true, text);
         } else {
-          this.submitButton.removeAttribute('disabled');
-          this.submitButtonText.textContent = window.variantStrings.addToCart;
+          this.syncSubmitButtons(false, window.variantStrings.addToCart);
         }
       }
 
