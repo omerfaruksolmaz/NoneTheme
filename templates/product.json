@@ -113,12 +113,19 @@
       "settings": {
         "include_margins": true
       }
+    },
+    "1780797798525102ee": {
+      "type": "apps",
+      "settings": {
+        "include_margins": true
+      }
     }
   },
   "order": [
     "main",
     "1780780899ccadbc30",
     "related",
-    "178078122169787811"
+    "178078122169787811",
+    "1780797798525102ee"
   ]
 }
