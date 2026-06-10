@@ -7,175 +7,26 @@
     padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
   }
 
+  .section-{{ section.id }}-hero-height {
+    min-height: {{ section.settings.hero_height | times: 0.75 | round: 0 }}px;
+  }
+
   @media screen and (min-width: 750px) {
     .section-{{ section.id }}-padding {
       padding-top: {{ section.settings.padding_top }}px;
       padding-bottom: {{ section.settings.padding_bottom }}px;
     }
-  }
 
-  .editorial-hero {
-    width: 100%;
-  }
-
-  .editorial-hero__layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-
-  @media screen and (min-width: 990px) {
-    .editorial-hero__layout {
-      grid-template-columns: {{ section.settings.image_width_pct }}% 1fr;
-      align-items: start;
-      gap: 3rem;
+    .section-{{ section.id }}-hero-height {
+      min-height: {{ section.settings.hero_height }}px;
     }
-  }
-
-  .editorial-hero__media {
-    position: relative;
-    width: 100%;
-    aspect-ratio: {{ section.settings.image_aspect_ratio }};
-    overflow: hidden;
-  }
-
-  .editorial-hero__image-wrap {
-    position: absolute;
-    inset: 0;
-  }
-
-  .editorial-hero__image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center top;
-    display: block;
-  }
-
-  .editorial-hero__media-link {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
-
-  .editorial-hero__image-wrap--fallback {
-    background: var(--color-background);
-  }
-
-  .editorial-hero__fallback {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1.2rem;
-    padding: 2rem;
-  }
-
-  .editorial-hero__fallback-symbol {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-  }
-
-  .editorial-hero__fallback-wordmark {
-    max-width: 200px;
-    height: auto;
-    object-fit: contain;
-  }
-
-  .editorial-hero__fallback-wordmark--dark {
-    display: none;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .editorial-hero__fallback-wordmark--light { display: none; }
-    .editorial-hero__fallback-wordmark--dark  { display: block; }
-  }
-
-  .editorial-hero__vertical-label {
-    position: absolute;
-    top: 50%;
-    left: -1.8rem;
-    transform: translateY(-50%) rotate(-90deg);
-    transform-origin: center center;
-    font-size: 0.625rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    color: var(--color-foreground);
-    opacity: 0.55;
-  }
-
-  @media screen and (max-width: 989px) {
-    .editorial-hero__vertical-label {
-      display: none;
-    }
-  }
-
-  .editorial-hero__season {
-    position: absolute;
-    bottom: 0.75rem;
-    left: 0.75rem;
-    font-size: 0.625rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--color-foreground);
-    opacity: 0.6;
-  }
-
-  .editorial-hero__view {
-    position: absolute;
-    bottom: 0.75rem;
-    right: 0.75rem;
-  }
-
-  .editorial-hero__notes {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
-    gap: 2rem 2.5rem;
-    align-content: start;
-  }
-
-  @media screen and (max-width: 749px) {
-    .editorial-hero__notes {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-  }
-
-  .editorial-hero__note {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 0.75rem;
-  }
-
-  .editorial-hero__note-heading {
-    font-size: var(--font-heading-scale, 1rem);
-    margin: 0.2rem 0 0;
-    font-weight: 500;
-  }
-
-  .editorial-hero__note-body {
-    font-size: 0.8125rem;
-    line-height: 1.55;
-    opacity: 0.8;
-  }
-
-  .editorial-hero__note-link {
-    margin-top: 0.5rem;
   }
 {%- endstyle -%}
-
-{%- capture hero_sizes -%}(min-width: 990px) {{ section.settings.image_width_pct }}vw, 100vw{%- endcapture -%}
 
 <section class="editorial-hero section-{{ section.id }}-padding">
   <div class="page-width">
     <div class="editorial-hero__layout">
-      <div class="editorial-hero__media">
+      <div class="editorial-hero__media section-{{ section.id }}-hero-height">
         {%- if section.settings.image != blank -%}
           {%- if section.settings.image_link != blank -%}
             <a class="editorial-hero__media-link" href="{{ section.settings.image_link }}">
@@ -183,13 +34,13 @@
           <div class="editorial-hero__image-wrap">
             {{
               section.settings.image
-              | image_url: width: 1800
+              | image_url: width: 2400
               | image_tag:
                 class: 'editorial-hero__image',
                 loading: 'eager',
                 fetchpriority: 'high',
-                widths: '480, 600, 800, 1000, 1200, 1500, 1800',
-                sizes: hero_sizes,
+                widths: '600, 900, 1200, 1500, 1800, 2200, 2400',
+                sizes: '(min-width: 990px) 65vw, 100vw',
                 alt: section.settings.image.alt | default: shop.name | escape
             }}
           </div>
@@ -203,24 +54,24 @@
                 class="editorial-hero__fallback-symbol"
                 src="{{ 'nonewear-e-logo.png' | asset_url }}"
                 alt=""
-                width="60"
-                height="60"
+                width="120"
+                height="120"
                 loading="eager"
               >
               <img
                 class="editorial-hero__fallback-wordmark editorial-hero__fallback-wordmark--light"
                 src="{{ 'nonewear-wordmark-black.png' | asset_url }}"
                 alt="None Wear"
-                width="200"
-                height="28"
+                width="360"
+                height="50"
                 loading="eager"
               >
               <img
                 class="editorial-hero__fallback-wordmark editorial-hero__fallback-wordmark--dark"
                 src="{{ 'nonewear-wordmark-white.png' | asset_url }}"
                 alt="None Wear"
-                width="200"
-                height="28"
+                width="360"
+                height="50"
                 loading="eager"
               >
               <p>{{ section.settings.brand_statement | escape }}</p>
@@ -292,29 +143,6 @@
       "label": "Hero image link"
     },
     {
-      "type": "select",
-      "id": "image_aspect_ratio",
-      "label": "Image proportions",
-      "options": [
-        { "value": "3 / 4",  "label": "Portrait 3:4" },
-        { "value": "4 / 5",  "label": "Portrait 4:5" },
-        { "value": "1 / 1",  "label": "Square 1:1" },
-        { "value": "5 / 4",  "label": "Landscape 5:4" },
-        { "value": "16 / 9", "label": "Landscape 16:9" }
-      ],
-      "default": "3 / 4"
-    },
-    {
-      "type": "range",
-      "id": "image_width_pct",
-      "min": 30,
-      "max": 65,
-      "step": 5,
-      "unit": "%",
-      "label": "Image column width (desktop)",
-      "default": 45
-    },
-    {
       "type": "text",
       "id": "vertical_label",
       "label": "Vertical label",
@@ -342,6 +170,16 @@
       "id": "brand_statement",
       "label": "Fallback brand statement",
       "default": "Kural yok. Sistem dışı. Giy ve kaybol."
+    },
+    {
+      "type": "range",
+      "id": "hero_height",
+      "min": 480,
+      "max": 920,
+      "step": 20,
+      "unit": "px",
+      "label": "Hero height",
+      "default": 720
     },
     {
       "type": "header",
